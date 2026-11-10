@@ -213,7 +213,7 @@ const htmlTemplate = `<!DOCTYPE html>
                             </tr>
                             <tr class="highlight">
                                 <td><strong>Monatlicher Teilzahlungsbetrag</strong></td>
-                                <td class="r">{{printf "%.2f" .Ergebnis.MonatsAbschlag}} €</td>
+{{printf "%.2f" .Ergebnis.MonatsAbschlag}} €
 Effektiver Gesamtpreis je kWh (Brutto)
 {{printf "%.2f" .Ergebnis.EffektiverKWhPreis}} Cent/kWh
 {{end}}
