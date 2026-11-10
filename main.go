@@ -109,34 +109,166 @@ func main() {
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
 
-const htmlPart1 = `<!DOCTYPE html>
+const htmlPart1 = `<!-- Copyright by Ing. Burkhard Kaar, 8580 Koeflach, Austria -->
+
+<!DOCTYPE html>
 <html lang="de">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Strompreisrechner Österreich</title>
     <style>
-        body { font-family: 'Roboto', sans-serif; max-width: 800px; margin: 20px auto; padding: 20px; background: #000000; color: #333; }
-        .card { background: white; padding: 25px; border-radius: 5px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); }
-        h1 { color: #111; border-bottom: 2px solid #eee; padding-bottom: 8px; margin-top: 0; font-size: 24px; }
-        h2 { color: #111; margin-top: 20px; font-size: 20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; }
-        h3 { color: #428787; margin-bottom: 12px; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; font-size: 18px; }
-        .grid { display: grid; grid-template-columns: 1fr; gap: 20px; margin-bottom: 20px; }
-        .box { background: #f8fafc; padding: 15px; border-radius: 5px; border: 1px solid #e2e8f0; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; font-size: 14px; font-weight: bold; color: #475569; margin-bottom: 6px; }
-        input[type="number"], input[type="text"] { width: 100%; padding: 8px; border: 1px solid #cbd5e1; font-size: 16px; box-sizing: border-box; }
-        button { background: #428787; color: white; border: none; padding: 12px; cursor: pointer; font-size: 16px; border-radius: 4px; width: 100%; font-weight: bold; transition: all 0.2s; }
-        button:hover:not(:disabled) { background: #336666; }
-        button:disabled { background: #cbd5e1; color: #94a3b8; cursor: not-allowed; opacity: 0.7; }
-        .error { color: #b91c1c; font-weight: bold; background: #fee2e2; padding: 12px; border-radius: 4px; border: 1px solid #fca5a5; margin-bottom: 20px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 20px; font-size: 14px; }
-        th, td { border: 1px solid #e2e8f0; padding: 8px 12px; text-align: left; }
-        th { background-color: #428787 !important; color: white !important; }
-        tr:nth-child(even) { background-color: #f8fafc; }
-        .r { text-align: right; }
-        .hint { color: #64748b; font-size: 12px; margin-top: 4px; display: block; font-weight: normal; }
-        .highlight { font-weight: bold; background-color: #e2f2f2; }
+        body {
+            font-family: 'Roboto', sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #000000;
+            color: #333;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 5px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        h1 {
+            color: #111;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 8px;
+            margin-top: 0;
+            font-size: 24px;
+        }
+
+        h2 {
+            color: #111;
+            margin-top: 20px;
+            font-size: 20px;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 4px;
+        }
+
+        h3 {
+            color: #428787;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 4px;
+            font-size: 18px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .box {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: bold;
+            color: #475569;
+            margin-bottom: 6px;
+        }
+
+        input[type="number"],
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #cbd5e1;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background: #428787;
+            color: white;
+            border: none;
+            padding: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 4px;
+            width: 100%;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        button:hover:not(:disabled) {
+            background: #336666;
+        }
+
+        button:disabled {
+            background: #cbd5e1;
+            color: #94a3b8;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .error {
+            color: #b91c1c;
+            font-weight: bold;
+            background: #fee2e2;
+            padding: 12px;
+            border-radius: 4px;
+            border: 1px solid #fca5a5;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        th,
+        td {
+            border: 1px solid #e2e8f0;
+            padding: 8px 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #428787 !important;
+            color: white !important;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        .r {
+            text-align: right;
+        }
+
+        .hint {
+            color: #64748b;
+            font-size: 12px;
+            margin-top: 4px;
+            display: block;
+            font-weight: normal;
+        }
+
+        .highlight {
+            font-weight: bold;
+            background-color: #e2f2f2;
+        }
+
     </style>
     <script>
         function pruefeFormular() {
@@ -152,33 +284,40 @@ const htmlPart1 = `<!DOCTYPE html>
         }
         document.addEventListener('DOMContentLoaded', function() {
             var form = document.getElementById('stromForm');
-            if (form) { form.addEventListener('input', pruefeFormular); }
+            if (form) {
+                form.addEventListener('input', pruefeFormular);
+            }
             pruefeFormular();
         });
+
     </script>
 </head>
+
 <body>
     <div class="card">
         <h1>Strompreisrechner Österreich</h1>
         <p style="color: #428787; font-style: italic; margin-top: -5px; margin-bottom: 20px; font-size: 14px;">Berechnungsbasis: Stadtwerke Köflach / Netz Steiermark</p>
-        {{if .Fehler}}<div class="error">{{.Fehler}}</div>{{end}}
+        {{if .Fehler}}
+        <div class="error">{{.Fehler}}</div>{{end}}
         <form method="POST" id="stromForm">
             <div class="grid">
                 <div class="box">
                     <h3>Eingabeparameter</h3>
                     <div class="form-group">
                         <label for="verbrauch">Jahresverbrauch (in kWh):</label>
-                        <input type="text" id="verbrauch" name="verbrauch" placeholder="z.B. 3945" value="{{.VerbrauchIn}}" required>
+                        <input type="text" id="verbrauch" name="verbrauch" placeholder="z.B. 3.945,30" value="{{.VerbrauchIn}}" required>
                     </div>
                     <div class="form-group">
                         <label for="preis">Energie-Arbeitspreis (in Cent/kWh):</label>
                         <input type="text" id="preis" name="preis" placeholder="z.B. 15.90" value="{{.PreisIn}}" required>
                         <span class="hint">Reiner Energiepreis laut Tarifblatt exkl. Netz und Steuern</span>
                     </div>
-                    <div><h6>&copy; Strompreisrechner für österreichische Netztarife und Abgabenstrukturen</h6></div>
+                    <div>
+                        <h6>© Ing. Burkhard Kaar - Studienprojekt imperative Programmierung, Strompreisrechner für Österreich</h6>
+                    </div>
                     <button type="submit" id="submitBtn" disabled>Berechnung starten</button>`
 
-const htmlPart2 = `{{if .Berechnet}}
+                    const htmlPart2 = `{{if .Berechnet}}
                     <h2>Berechnungsergebnisse</h2>
                     <table>
                         <thead>
@@ -188,17 +327,50 @@ const htmlPart2 = `{{if .Berechnet}}
                             </tr>
                         </thead>
                         <tbody>
-                            <tr><td>Reine Energiekosten (variabel)</td><td class="r">{{printf "%.2f" .Ergebnis.EnergieKostenNetto}} €</td></tr>
-                            <tr><td>Energie Grundpreis (fix)</td><td class="r">{{printf "%.2f" .Ergebnis.EnergieGrundpreis}} €</td></tr>
-                            <tr><td>Netznutzung (variabel)</td><td class="r">{{printf "%.2f" .Ergebnis.NetzArbeitspreis}} €</td></tr>
-                            <tr><td>Netzverlustentgelt (variabel)</td><td class="r">{{printf "%.2f" .Ergebnis.NetzVerlustNetto}} €</td></tr>
-                            <tr><td>Netz-Grundpreis &amp; Messpauschale (fix)</td><td class="r">{{printf "%.2f" .Ergebnis.NetzGrundpreis}} €</td></tr>
-                            <tr><td>Elektrizitätsabgabe</td><td class="r">{{printf "%.2f" .Ergebnis.ElektroAbgabeNetto}} €</td></tr>
-                            <tr class="highlight"><td>Zwischensumme Netto</td><td class="r">{{printf "%.2f" .Ergebnis.NettoGesamt}} €</td></tr>
-                            <tr><td>+ 20% Umsatzsteuer</td><td class="r">{{printf "%.2f" .Ergebnis.Umsatzsteuer}} €</td></tr>
-                            <tr class="highlight" style="background-color: #428787; color: white;"><td style="color: white;"><strong>JAHRESBETRAG BRUTTO</strong></td><td class="r" style="color: white;"><strong>{{printf "%.2f" .Ergebnis.BruttoGesamt}} €</strong></td></tr>
-                            <tr class="highlight"><td><strong>Monatlicher Teilzahlungsbetrag</strong></td><td class="r"><strong>{{printf "%.2f" .Ergebnis.MonatsAbschlag}} €</strong></td></tr>
-                            <tr class="highlight"><td><strong>Effektiver Gesamtpreis je kWh (Brutto)</strong></td><td class="r"><strong>{{printf "%.2f" .Ergebnis.EffektiverKWhPreis}} Cent/kWh</strong></td></tr>
+                            <tr>
+                                <td>Reine Energiekosten (variabel)</td>
+                                <td class="r">{{printf "%.2f" .Ergebnis.EnergieKostenNetto}} €</td>
+                            </tr>
+                            <tr>
+                                <td>Energie Grundpreis (fix)</td>
+                                <td class="r">{{printf "%.2f" .Ergebnis.EnergieGrundpreis}} €</td>
+                            </tr>
+                            <tr>
+                                <td>Netznutzung (variabel)</td>
+                                <td class="r">{{printf "%.2f" .Ergebnis.NetzArbeitspreis}} €</td>
+                            </tr>
+                            <tr>
+                                <td>Netzverlustentgelt (variabel)</td>
+                                <td class="r">{{printf "%.2f" .Ergebnis.NetzVerlustNetto}} €</td>
+                            </tr>
+                            <tr>
+                                <td>Netz-Grundpreis &amp; Messpauschale (fix)</td>
+                                <td class="r">{{printf "%.2f" .Ergebnis.NetzGrundpreis}} €</td>
+                            </tr>
+                            <tr>
+                                <td>Elektrizitätsabgabe</td>
+                                <td class="r">{{printf "%.2f" .Ergebnis.ElektroAbgabeNetto}} €</td>
+                            </tr>
+                            <tr class="highlight">
+                                <td>Zwischensumme Netto</td>
+                                <td class="r">{{printf "%.2f" .Ergebnis.NettoGesamt}} €</td>
+                            </tr>
+                            <tr>
+                                <td>+ 20% Umsatzsteuer</td>
+                                <td class="r">{{printf "%.2f" .Ergebnis.Umsatzsteuer}} €</td>
+                            </tr>
+                            <tr class="highlight" style="background-color: #428787; color: white;">
+                                <td style="color: white;">JAHRESBETRAG BRUTTO</td>
+                                <td class="r" style="color: white;"><strong>{{printf "%.2f" .Ergebnis.BruttoGesamt}} €</strong></td>
+                            </tr>
+                            <tr class="highlight">
+                                <td>Monatlicher Teilzahlungsbetrag</td>
+                                <td class="r">{{printf "%.2f" .Ergebnis.MonatsAbschlag}} €</td>
+                            </tr>
+                            <tr class="highlight">
+                                <td>Effektiver Gesamtpreis je kWh (Brutto)</td>
+                                <td class="r">{{printf "%.2f" .Ergebnis.EffektiverKWhPreis}} Cent/kWh</td>
+                            </tr>
                         </tbody>
                     </table>
                     {{end}}
@@ -207,4 +379,6 @@ const htmlPart2 = `{{if .Berechnet}}
         </form>
     </div>
 </body>
-</html>`
+
+</html>
+`
