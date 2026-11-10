@@ -72,7 +72,6 @@ func berechneStrompreis(verbrauch float64, preisProKWh float64) StromRechnung {
 }
 
 func main() {
-	// HTML-Template parsen
 	tmpl := template.Must(template.New("index").Parse(htmlTemplate))
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -102,7 +101,6 @@ func main() {
 		tmpl.Execute(w, data)
 	})
 
-	// Dynamische Port-Zuweisung für Render
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
@@ -112,7 +110,6 @@ func main() {
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
 
-// Das saubere, vollendete HTML-Layout als String
 const htmlTemplate = `<!DOCTYPE html>
 <html lang="de">
 <head>
@@ -129,8 +126,8 @@ const htmlTemplate = `<!DOCTYPE html>
         .box { background: #f8fafc; padding: 15px; border-radius: 5px; border: 1px solid #e2e8f0; }
         .form-group { margin-bottom: 15px; }
         label { display: block; font-size: 14px; font-weight: bold; color: #475569; margin-bottom: 6px; }
-        input[type="number"] { width: 100%; padding: 8px; border: 1px solid #cbd5e1; font-size: 16px; box-sizing: border-box; }
-        button { background: #428787; color: white; border: none; padding: 12px; cursor: pointer; font-size: 16px; border-radius: 4px; width: 100%; font-weight: bold; transition: background 0.2s; }
+        input[type="number"], input[type="text"] { width: 100%; padding: 8px; border: 1px solid #cbd5e1; font-size: 16px; box-sizing: border-box; }
+        button { background: #428787; color: white; border: none; padding: 12px; cursor: pointer; font-size: 16px; border-radius: 4px; width: 100%; font-weight: bold; transition: all 0.2s; }
         button:hover:not(:disabled) { background: #336666; }
         button:disabled { background: #cbd5e1; color: #94a3b8; cursor: not-allowed; opacity: 0.7; }
         .error { color: #b91c1c; font-weight: bold; background: #fee2e2; padding: 12px; border-radius: 4px; border: 1px solid #fca5a5; margin-bottom: 20px; }
@@ -158,18 +155,18 @@ const htmlTemplate = `<!DOCTYPE html>
                     <h3>Eingabeparameter</h3>
                     <div class="form-group">
                         <label for="verbrauch">Jahresverbrauch (in kWh):</label>
-                        <input type="number" id="verbrauch" name="verbrauch" placeholder="z.B. 3945" step="any" value="{{.VerbrauchIn}}" required>
+                        <input type="text" id="verbrauch" name="verbrauch" placeholder="z.B. 3945" value="{{.VerbrauchIn}}" required>
                     </div>
                     <div class="form-group">
                         <label for="preis">Energie-Arbeitspreis (in Cent/kWh):</label>
-                        <input type="number" id="preis" name="preis" placeholder="z.B. 15.90" step="any" value="{{.PreisIn}}" required>
+                        <input type="text" id="preis" name="preis" placeholder="z.B. 15.90" value="{{.PreisIn}}" required>
                         <span class="hint">Reiner Energiepreis laut Tarifblatt exkl. Netz und Steuern</span>
                     </div>
                     <div><h6>&copy; Strompreisrechner für österreichische Netztarife und Abgabenstrukturen</h6></div>
                     <button type="submit" id="submitBtn" disabled>Berechnung starten</button>
                     
                     {{if .Berechnet}}
-                    <h2 class="result-title">Berechnungsergebnisse</h2>
+                    <h2>Berechnungsergebnisse</h2>
                     <table>
                         <thead>
                             <tr>
@@ -214,12 +211,12 @@ const htmlTemplate = `<!DOCTYPE html>
                                 <td style="color: white;"><strong>JAHRESBETRAG BRUTTO</strong></td>
                                 <td class="r" style="color: white;"><strong>{{printf "%.2f" .Ergebnis.BruttoGesamt}} €</strong></td>
                             </tr>
-Monatlicher Teilzahlungsbetrag
+                            <tr class="highlight">
+                                <td><strong>Monatlicher Teilzahlungsbetrag</strong></td>
 {{printf "%.2f" .Ergebnis.MonatsAbschlag}} €
 Effektiver Gesamtpreis je kWh (Brutto)
 {{printf "%.2f" .Ergebnis.EffektiverKWhPreis}} Cent/kWh
 {{end}}
-
 
 
 const form = document.getElementById('stromForm');
@@ -232,7 +229,6 @@ submitBtn.setAttribute('disabled', 'true');
 }
 }
 form.addEventListener('input', pruefeFormular);
-// Führt die Prüfung beim Laden aus, falls bereits Werte drinstehen
 pruefeFormular();
 
 `
