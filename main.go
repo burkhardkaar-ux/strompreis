@@ -219,6 +219,7 @@ Effektiver Gesamtpreis je kWh (Brutto)
 {{end}}
 
 
+
 const form = document.getElementById('stromForm');
 const submitBtn = document.getElementById('submitBtn');
 function pruefeFormular() {
@@ -230,5 +231,6 @@ submitBtn.setAttribute('disabled', 'true');
 }
 form.addEventListener('input', pruefeFormular);
 pruefeFormular();
+
 
 `
