@@ -9,7 +9,6 @@ import (
 	"strings"
 )
 
-// StromRechnung hält alle berechneten Posten für die HTML-Ausgabe bereit
 type StromRechnung struct {
 	VerbrauchKWh        float64
 	EnergieArbeitspreis float64
@@ -26,7 +25,6 @@ type StromRechnung struct {
 	EffektiverKWhPreis  float64
 }
 
-// PageData steuert die Anzeige im HTML-Template
 type PageData struct {
 	Berechnet   bool
 	Fehler      string
@@ -35,7 +33,6 @@ type PageData struct {
 	Ergebnis    StromRechnung
 }
 
-// berechneStrompreis führt die Kalkulation mit den steirischen Tarifen durch
 func berechneStrompreis(verbrauch float64, preisProKWh float64) StromRechnung {
 	energieGrundpreis := 59.90
 	netzArbeitspreisProKWh := 9.11
@@ -217,13 +214,15 @@ const htmlTemplate = `<!DOCTYPE html>
                             </tr>
                             <tr class="highlight">
                                 <td><strong>Effektiver Gesamtpreis je kWh (Brutto)</strong></td>
-{{printf "%.2f" .Ergebnis.EffektiverKWhPreis}} Cent/kWh
-{{end}}
+                                <td class="r"><strong>{{printf "%.2f" .Ergebnis.EffektiverKWhPreis}} Cent/kWh</strong></td>
+                            </tr>
+						</tbody>
+						{{end}}
 
 
 
-const form = document.getElementById('stromForm');
-const submitBtn = document.getElementById('submitBtn');
+var form = document.getElementById('stromForm');
+var submitBtn = document.getElementById('submitBtn');
 function pruefeFormular() {
 if (form.checkValidity()) {
 submitBtn.removeAttribute('disabled');
