@@ -4,6 +4,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -101,11 +102,17 @@ func main() {
 		tmpl.Execute(w, data)
 	})
 
-	log.Println("Server läuft unter http://localhost:8080 ...")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	// Dynamische Port-Zuweisung für Render
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
+	log.Printf("Server läuft auf Port %s ...", port)
+	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
 
-// Das exakte HTML-Layout eingebettet als String
+// Das exakte HTML-Layout eingebettet als String (nach deinem Muster)
 const htmlTemplate = `<!DOCTYPE html>
 <html lang="de">
 <head>
@@ -202,22 +209,19 @@ const htmlTemplate = `<!DOCTYPE html>
                                 <td>+ 20% Umsatzsteuer</td>
                                 <td class="r">{{printf "%.2f" .Ergebnis.Umsatzsteuer}}</td>
                             </tr>
-                            <th colspan="2" style="background-color: #336666 !important;">Effektive Endwerte (Brutto)</th>
-                            <tr class="highlight" style="background-color: #e2f2f2;">
-                                <td><strong>JAHRESBETRAG BRUTTO</strong></td>
-                                <td class="r"><strong>{{printf "%.2f" .Ergebnis.BruttoGesamt}} €</strong></td>
+                            <tr class="highlight" style="background-color: #428787; color: white;">
+                                <td style="color: white;"><strong>JAHRESBETRAG BRUTTO</strong></td>
+                                <td class="r" style="color: white;"><strong>{{printf "%.2f" .Ergebnis.BruttoGesamt}} €</strong></td>
                             </tr>
                             <tr class="highlight">
-                                <td><strong>Monatlicher Teilzahlungsbetrag</strong></td>
+Monatlicher Teilzahlungsbetrag
 {{printf "%.2f" .Ergebnis.MonatsAbschlag}} €
-Effektiver Gesamtpreis je kWh
-{{printf "%.2f" .Ergebnis.EffektiverKWhPreis}} Cent/kWh
+Effektiver Gesamtpreis je kWh (Brutto)
+{{printf "%.2f" .Ergebnis.EffektiverKWhPreis}} Cent
 {{end}}
 
 
-button { background: #428787; color: white; border: none; padding: 12px; cursor: pointer; font-size: 16px; border-radius: 4px; width: 100%; font-weight: bold; transition: all 0.2s; }
-button:hover:not(:disabled) { background: #336666; }
-button:disabled { background: #cbd5e1; color: #94a3b8; cursor: not-allowed; opacity: 0.7; }
+
 const form = document.getElementById('stromForm');
 const submitBtn = document.getElementById('submitBtn');
 function pruefeFormular() {
