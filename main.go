@@ -77,8 +77,8 @@ func main() {
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		data := PageData{
-			VerbrauchIn: "3945", // Standard-Platzhalterwerte
-			PreisIn:     "15.90",
+			VerbrauchIn: "",
+			PreisIn:     "",
 		}
 
 		if r.Method == http.MethodPost {
@@ -112,7 +112,7 @@ func main() {
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
 
-// Das exakte HTML-Layout eingebettet als String (nach deinem Muster)
+// Das saubere, vollendete HTML-Layout als String
 const htmlTemplate = `<!DOCTYPE html>
 <html lang="de">
 <head>
@@ -129,9 +129,10 @@ const htmlTemplate = `<!DOCTYPE html>
         .box { background: #f8fafc; padding: 15px; border-radius: 5px; border: 1px solid #e2e8f0; }
         .form-group { margin-bottom: 15px; }
         label { display: block; font-size: 14px; font-weight: bold; color: #475569; margin-bottom: 6px; }
-        input[type="number"], input[type="text"] { width: 100%; padding: 8px; border: 1px solid #cbd5e1; font-size: 16px; box-sizing: border-box; }
+        input[type="number"] { width: 100%; padding: 8px; border: 1px solid #cbd5e1; font-size: 16px; box-sizing: border-box; }
         button { background: #428787; color: white; border: none; padding: 12px; cursor: pointer; font-size: 16px; border-radius: 4px; width: 100%; font-weight: bold; transition: background 0.2s; }
-        button:hover { background: #336666; }
+        button:hover:not(:disabled) { background: #336666; }
+        button:disabled { background: #cbd5e1; color: #94a3b8; cursor: not-allowed; opacity: 0.7; }
         .error { color: #b91c1c; font-weight: bold; background: #fee2e2; padding: 12px; border-radius: 4px; border: 1px solid #fca5a5; margin-bottom: 20px; }
         table { width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 20px; font-size: 14px; }
         th, td { border: 1px solid #e2e8f0; padding: 8px 12px; text-align: left; }
@@ -157,11 +158,11 @@ const htmlTemplate = `<!DOCTYPE html>
                     <h3>Eingabeparameter</h3>
                     <div class="form-group">
                         <label for="verbrauch">Jahresverbrauch (in kWh):</label>
-                        <input type="text" id="verbrauch" name="verbrauch" placeholder="z.B. 3945" value="{{.VerbrauchIn}}" required>
+                        <input type="number" id="verbrauch" name="verbrauch" placeholder="z.B. 3945" step="any" value="{{.VerbrauchIn}}" required>
                     </div>
                     <div class="form-group">
                         <label for="preis">Energie-Arbeitspreis (in Cent/kWh):</label>
-                        <input type="text" id="preis" name="preis" placeholder="z.B. 15.90" value="{{.PreisIn}}" required>
+                        <input type="number" id="preis" name="preis" placeholder="z.B. 15.90" step="any" value="{{.PreisIn}}" required>
                         <span class="hint">Reiner Energiepreis laut Tarifblatt exkl. Netz und Steuern</span>
                     </div>
                     <div><h6>&copy; Strompreisrechner für österreichische Netztarife und Abgabenstrukturen</h6></div>
@@ -172,52 +173,51 @@ const htmlTemplate = `<!DOCTYPE html>
                     <table>
                         <thead>
                             <tr>
-                                <th>Kostenbestandteil (Netto)</th>
-                                <th class="r">Betrag (€)</th>
+                                <th>Kostenbestandteil</th>
+                                <th class="r">Betrag (Netto)</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
                                 <td>Reine Energiekosten (variabel)</td>
-                                <td class="r">{{printf "%.2f" .Ergebnis.EnergieKostenNetto}}</td>
+                                <td class="r">{{printf "%.2f" .Ergebnis.EnergieKostenNetto}} €</td>
                             </tr>
                             <tr>
                                 <td>Energie Grundpreis (fix)</td>
-                                <td class="r">{{printf "%.2f" .Ergebnis.EnergieGrundpreis}}</td>
+                                <td class="r">{{printf "%.2f" .Ergebnis.EnergieGrundpreis}} €</td>
                             </tr>
                             <tr>
                                 <td>Netznutzung (variabel)</td>
-                                <td class="r">{{printf "%.2f" .Ergebnis.NetzArbeitspreis}}</td>
+                                <td class="r">{{printf "%.2f" .Ergebnis.NetzArbeitspreis}} €</td>
                             </tr>
                             <tr>
                                 <td>Netzverlustentgelt (variabel)</td>
-                                <td class="r">{{printf "%.2f" .Ergebnis.NetzVerlustNetto}}</td>
+                                <td class="r">{{printf "%.2f" .Ergebnis.NetzVerlustNetto}} €</td>
                             </tr>
                             <tr>
                                 <td>Netz-Grundpreis &amp; Messpauschale (fix)</td>
-                                <td class="r">{{printf "%.2f" .Ergebnis.NetzGrundpreis}}</td>
+                                <td class="r">{{printf "%.2f" .Ergebnis.NetzGrundpreis}} €</td>
                             </tr>
                             <tr>
                                 <td>Elektrizitätsabgabe</td>
-                                <td class="r">{{printf "%.2f" .Ergebnis.ElektroAbgabeNetto}}</td>
+                                <td class="r">{{printf "%.2f" .Ergebnis.ElektroAbgabeNetto}} €</td>
                             </tr>
                             <tr class="highlight">
                                 <td>Zwischensumme Netto</td>
-                                <td class="r">{{printf "%.2f" .Ergebnis.NettoGesamt}}</td>
+                                <td class="r">{{printf "%.2f" .Ergebnis.NettoGesamt}} €</td>
                             </tr>
                             <tr>
                                 <td>+ 20% Umsatzsteuer</td>
-                                <td class="r">{{printf "%.2f" .Ergebnis.Umsatzsteuer}}</td>
+                                <td class="r">{{printf "%.2f" .Ergebnis.Umsatzsteuer}} €</td>
                             </tr>
                             <tr class="highlight" style="background-color: #428787; color: white;">
                                 <td style="color: white;"><strong>JAHRESBETRAG BRUTTO</strong></td>
                                 <td class="r" style="color: white;"><strong>{{printf "%.2f" .Ergebnis.BruttoGesamt}} €</strong></td>
                             </tr>
-                            <tr class="highlight">
 Monatlicher Teilzahlungsbetrag
 {{printf "%.2f" .Ergebnis.MonatsAbschlag}} €
 Effektiver Gesamtpreis je kWh (Brutto)
-{{printf "%.2f" .Ergebnis.EffektiverKWhPreis}} Cent
+{{printf "%.2f" .Ergebnis.EffektiverKWhPreis}} Cent/kWh
 {{end}}
 
 
@@ -232,6 +232,7 @@ submitBtn.setAttribute('disabled', 'true');
 }
 }
 form.addEventListener('input', pruefeFormular);
+// Führt die Prüfung beim Laden aus, falls bereits Werte drinstehen
 pruefeFormular();
 
 `
