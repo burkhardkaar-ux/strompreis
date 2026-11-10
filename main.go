@@ -69,7 +69,9 @@ func berechneStrompreis(verbrauch float64, preisProKWh float64) StromRechnung {
 }
 
 func main() {
-	tmpl := template.Must(template.New("index").Parse(htmlTemplate))
+	// Die beiden HTML-Teile sicher zusammenfügen
+	vollstaendigesHTML := htmlPart1 + htmlPart2
+	tmpl := template.Must(template.New("index").Parse(vollstaendigesHTML))
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		data := PageData{
@@ -107,7 +109,7 @@ func main() {
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
 
-const htmlTemplate = `<!DOCTYPE html>
+const htmlPart1 = `<!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -136,16 +138,30 @@ const htmlTemplate = `<!DOCTYPE html>
         .hint { color: #64748b; font-size: 12px; margin-top: 4px; display: block; font-weight: normal; }
         .highlight { font-weight: bold; background-color: #e2f2f2; }
     </style>
+    <script>
+        function pruefeFormular() {
+            var form = document.getElementById('stromForm');
+            var submitBtn = document.getElementById('submitBtn');
+            if (form && submitBtn) {
+                if (form.checkValidity()) {
+                    submitBtn.removeAttribute('disabled');
+                } else {
+                    submitBtn.setAttribute('disabled', 'true');
+                }
+            }
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            var form = document.getElementById('stromForm');
+            if (form) { form.addEventListener('input', pruefeFormular); }
+            pruefeFormular();
+        });
+    </script>
 </head>
 <body>
     <div class="card">
         <h1>Strompreisrechner Österreich</h1>
         <p style="color: #428787; font-style: italic; margin-top: -5px; margin-bottom: 20px; font-size: 14px;">Berechnungsbasis: Stadtwerke Köflach / Netz Steiermark</p>
-        
-        {{if .Fehler}}
-        <div class="error">{{.Fehler}}</div>
-        {{end}}
-        
+        {{if .Fehler}}<div class="error">{{.Fehler}}</div>{{end}}
         <form method="POST" id="stromForm">
             <div class="grid">
                 <div class="box">
@@ -160,9 +176,9 @@ const htmlTemplate = `<!DOCTYPE html>
                         <span class="hint">Reiner Energiepreis laut Tarifblatt exkl. Netz und Steuern</span>
                     </div>
                     <div><h6>&copy; Strompreisrechner für österreichische Netztarife und Abgabenstrukturen</h6></div>
-                    <button type="submit" id="submitBtn" disabled>Berechnung starten</button>
-                    
-                    {{if .Berechnet}}
+                    <button type="submit" id="submitBtn" disabled>Berechnung starten</button>`
+
+const htmlPart2 = `{{if .Berechnet}}
                     <h2>Berechnungsergebnisse</h2>
                     <table>
                         <thead>
@@ -172,64 +188,23 @@ const htmlTemplate = `<!DOCTYPE html>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>Reine Energiekosten (variabel)</td>
-                                <td class="r">{{printf "%.2f" .Ergebnis.EnergieKostenNetto}} €</td>
-                            </tr>
-                            <tr>
-                                <td>Energie Grundpreis (fix)</td>
-                                <td class="r">{{printf "%.2f" .Ergebnis.EnergieGrundpreis}} €</td>
-                            </tr>
-                            <tr>
-                                <td>Netznutzung (variabel)</td>
-                                <td class="r">{{printf "%.2f" .Ergebnis.NetzArbeitspreis}} €</td>
-                            </tr>
-                            <tr>
-                                <td>Netzverlustentgelt (variabel)</td>
-                                <td class="r">{{printf "%.2f" .Ergebnis.NetzVerlustNetto}} €</td>
-                            </tr>
-                            <tr>
-                                <td>Netz-Grundpreis &amp; Messpauschale (fix)</td>
-                                <td class="r">{{printf "%.2f" .Ergebnis.NetzGrundpreis}} €</td>
-                            </tr>
-                            <tr>
-                                <td>Elektrizitätsabgabe</td>
-                                <td class="r">{{printf "%.2f" .Ergebnis.ElektroAbgabeNetto}} €</td>
-                            </tr>
-                            <tr class="highlight">
-                                <td>Zwischensumme Netto</td>
-                                <td class="r">{{printf "%.2f" .Ergebnis.NettoGesamt}} €</td>
-                            </tr>
-                            <tr>
-                                <td>+ 20% Umsatzsteuer</td>
-                                <td class="r">{{printf "%.2f" .Ergebnis.Umsatzsteuer}} €</td>
-                            </tr>
-                            <tr class="highlight" style="background-color: #428787; color: white;">
-                                <td style="color: white;"><strong>JAHRESBETRAG BRUTTO</strong></td>
-                                <td class="r" style="color: white;"><strong>{{printf "%.2f" .Ergebnis.BruttoGesamt}} €</strong></td>
-                            </tr>
-                            <tr class="highlight">
-                                <td><strong>Monatlicher Teilzahlungsbetrag</strong></td>
-                                <td class="r"><strong>{{printf "%.2f" .Ergebnis.MonatsAbschlag}} €</strong></td>
-                            </tr>
-                            <tr class="highlight">
-                                <td><strong>Effektiver Gesamtpreis je kWh (Brutto)</strong></td>
-                                <td class="r"><strong>{{printf "%.2f" .Ergebnis.EffektiverKWhPreis}} Cent/kWh</strong></td>
-                            </tr>
-						</tbody>
-											</table>
-																{{end}}
-																var form = document.getElementById('stromForm');
-var submitBtn = document.getElementById('submitBtn');
-function pruefeFormular() {
-if (form.checkValidity()) {
-submitBtn.removeAttribute('disabled');
-} else {
-submitBtn.setAttribute('disabled', 'true');
-}
-}
-form.addEventListener('input', pruefeFormular);
-pruefeFormular();
-
-
-`
+                            <tr><td>Reine Energiekosten (variabel)</td><td class="r">{{printf "%.2f" .Ergebnis.EnergieKostenNetto}} €</td></tr>
+                            <tr><td>Energie Grundpreis (fix)</td><td class="r">{{printf "%.2f" .Ergebnis.EnergieGrundpreis}} €</td></tr>
+                            <tr><td>Netznutzung (variabel)</td><td class="r">{{printf "%.2f" .Ergebnis.NetzArbeitspreis}} €</td></tr>
+                            <tr><td>Netzverlustentgelt (variabel)</td><td class="r">{{printf "%.2f" .Ergebnis.NetzVerlustNetto}} €</td></tr>
+                            <tr><td>Netz-Grundpreis &amp; Messpauschale (fix)</td><td class="r">{{printf "%.2f" .Ergebnis.NetzGrundpreis}} €</td></tr>
+                            <tr><td>Elektrizitätsabgabe</td><td class="r">{{printf "%.2f" .Ergebnis.ElektroAbgabeNetto}} €</td></tr>
+                            <tr class="highlight"><td>Zwischensumme Netto</td><td class="r">{{printf "%.2f" .Ergebnis.NettoGesamt}} €</td></tr>
+                            <tr><td>+ 20% Umsatzsteuer</td><td class="r">{{printf "%.2f" .Ergebnis.Umsatzsteuer}} €</td></tr>
+                            <tr class="highlight" style="background-color: #428787; color: white;"><td style="color: white;"><strong>JAHRESBETRAG BRUTTO</strong></td><td class="r" style="color: white;"><strong>{{printf "%.2f" .Ergebnis.BruttoGesamt}} €</strong></td></tr>
+                            <tr class="highlight"><td><strong>Monatlicher Teilzahlungsbetrag</strong></td><td class="r"><strong>{{printf "%.2f" .Ergebnis.MonatsAbschlag}} €</strong></td></tr>
+                            <tr class="highlight"><td><strong>Effektiver Gesamtpreis je kWh (Brutto)</strong></td><td class="r"><strong>{{printf "%.2f" .Ergebnis.EffektiverKWhPreis}} Cent/kWh</strong></td></tr>
+                        </tbody>
+                    </table>
+                    {{end}}
+                </div>
+            </div>
+        </form>
+    </div>
+</body>
+</html>`
