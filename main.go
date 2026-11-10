@@ -111,6 +111,8 @@ func main() {
 
 const htmlPart1 = `<!-- Copyright by Ing. Burkhard Kaar, 8580 Koeflach, Austria -->
 
+<!-- Copyright by Ing. Burkhard Kaar, 8580 Koeflach, Austria -->
+
 <!DOCTYPE html>
 <html lang="de">
 
@@ -228,13 +230,23 @@ const htmlPart1 = `<!-- Copyright by Ing. Burkhard Kaar, 8580 Koeflach, Austria 
             margin-bottom: 20px;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 20px; font-size: 14px; }
+th, td { border: 1px solid #e2e8f0; padding: 8px 12px; text-align: left; }
+th { background-color: #428787 !important; color: white !important; }
+
+/* Setzt die vertikale Trennlinie weiter nach links (Spaltenaufteilung) */
+th:first-child, td:first-child {
+    width: 65%;
+}
+
+/* Verhindert, dass Beträge und Einheiten am Smartphone umbrechen */
+th:last-child, td:last-child {
+    white-space: nowrap;
+}
+
+tr:nth-child(even) { background-color: #f8fafc; }
+.r { text-align: right; }
+
 
         th,
         td {
@@ -328,7 +340,7 @@ const htmlPart1 = `<!-- Copyright by Ing. Burkhard Kaar, 8580 Koeflach, Austria 
                         </thead>
                         <tbody>
                             <tr>
-                                <td>Reine Energiekosten (variabel)</td>
+                                <td>Reine Energiekosten</td>
                                 <td class="r">{{printf "%.2f" .Ergebnis.EnergieKostenNetto}} €</td>
                             </tr>
                             <tr>
@@ -340,7 +352,7 @@ const htmlPart1 = `<!-- Copyright by Ing. Burkhard Kaar, 8580 Koeflach, Austria 
                                 <td class="r">{{printf "%.2f" .Ergebnis.NetzArbeitspreis}} €</td>
                             </tr>
                             <tr>
-                                <td>Netzverlustentgelt (variabel)</td>
+                                <td>Netzverlustentgelt</td>
                                 <td class="r">{{printf "%.2f" .Ergebnis.NetzVerlustNetto}} €</td>
                             </tr>
                             <tr>
@@ -381,4 +393,5 @@ const htmlPart1 = `<!-- Copyright by Ing. Burkhard Kaar, 8580 Koeflach, Austria 
 </body>
 
 </html>
+
 `
