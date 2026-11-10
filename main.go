@@ -9,6 +9,7 @@ import (
 	"strings"
 )
 
+// StromRechnung hält alle berechneten Posten für die HTML-Ausgabe bereit
 type StromRechnung struct {
 	VerbrauchKWh        float64
 	EnergieArbeitspreis float64
@@ -25,6 +26,7 @@ type StromRechnung struct {
 	EffektiverKWhPreis  float64
 }
 
+// PageData steuert die Anzeige im HTML-Template
 type PageData struct {
 	Berechnet   bool
 	Fehler      string
@@ -33,6 +35,7 @@ type PageData struct {
 	Ergebnis    StromRechnung
 }
 
+// berechneStrompreis führt die Kalkulation mit den steirischen Tarifen durch
 func berechneStrompreis(verbrauch float64, preisProKWh float64) StromRechnung {
 	energieGrundpreis := 59.90
 	netzArbeitspreisProKWh := 9.11
@@ -123,7 +126,7 @@ const htmlTemplate = `<!DOCTYPE html>
         .box { background: #f8fafc; padding: 15px; border-radius: 5px; border: 1px solid #e2e8f0; }
         .form-group { margin-bottom: 15px; }
         label { display: block; font-size: 14px; font-weight: bold; color: #475569; margin-bottom: 6px; }
-        input[type="number"] { width: 100%; padding: 8px; border: 1px solid #cbd5e1; font-size: 16px; box-sizing: border-box; }
+        input[type="number"], input[type="text"] { width: 100%; padding: 8px; border: 1px solid #cbd5e1; font-size: 16px; box-sizing: border-box; }
         button { background: #428787; color: white; border: none; padding: 12px; cursor: pointer; font-size: 16px; border-radius: 4px; width: 100%; font-weight: bold; transition: all 0.2s; }
         button:hover:not(:disabled) { background: #336666; }
         button:disabled { background: #cbd5e1; color: #94a3b8; cursor: not-allowed; opacity: 0.7; }
@@ -152,11 +155,11 @@ const htmlTemplate = `<!DOCTYPE html>
                     <h3>Eingabeparameter</h3>
                     <div class="form-group">
                         <label for="verbrauch">Jahresverbrauch (in kWh):</label>
-                        <input type="number" id="verbrauch" name="verbrauch" placeholder="z.B. 3945" step="any" value="{{.VerbrauchIn}}" required>
+                        <input type="text" id="verbrauch" name="verbrauch" placeholder="z.B. 3945" value="{{.VerbrauchIn}}" required>
                     </div>
                     <div class="form-group">
                         <label for="preis">Energie-Arbeitspreis (in Cent/kWh):</label>
-                        <input type="number" id="preis" name="preis" placeholder="z.B. 15.90" step="any" value="{{.PreisIn}}" required>
+                        <input type="text" id="preis" name="preis" placeholder="z.B. 15.90" value="{{.PreisIn}}" required>
                         <span class="hint">Reiner Energiepreis laut Tarifblatt exkl. Netz und Steuern</span>
                     </div>
                     <div><h6>&copy; Strompreisrechner für österreichische Netztarife und Abgabenstrukturen</h6></div>
@@ -214,12 +217,8 @@ const htmlTemplate = `<!DOCTYPE html>
                             </tr>
                             <tr class="highlight">
                                 <td><strong>Effektiver Gesamtpreis je kWh (Brutto)</strong></td>
-                                <td class="r"><strong>{{printf "%.2f" .Ergebnis.EffektiverKWhPreis}} Cent/kWh</strong></td>
-                            </tr>
-						</tbody>
-						{{end}}
-
-
+{{printf "%.2f" .Ergebnis.EffektiverKWhPreis}} Cent/kWh
+{{end}}
 
 
 
