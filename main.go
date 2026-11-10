@@ -217,11 +217,9 @@ const htmlTemplate = `<!DOCTYPE html>
                                 <td class="r"><strong>{{printf "%.2f" .Ergebnis.EffektiverKWhPreis}} Cent/kWh</strong></td>
                             </tr>
 						</tbody>
-						{{end}}
-
-
-
-var form = document.getElementById('stromForm');
+											</table>
+																{{end}}
+																var form = document.getElementById('stromForm');
 var submitBtn = document.getElementById('submitBtn');
 function pruefeFormular() {
 if (form.checkValidity()) {
