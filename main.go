@@ -115,6 +115,8 @@ const htmlPart1 = `<!-- Copyright by Ing. Burkhard Kaar, 8580 Koeflach, Austria 
 
 <!-- Copyright by Ing. Burkhard Kaar, 8580 Koeflach, Austria -->
 
+<!-- Copyright by Ing. Burkhard Kaar, 8580 Koeflach, Austria -->
+
 <!DOCTYPE html>
 <html lang="de">
 
@@ -343,7 +345,7 @@ const htmlPart1 = `<!-- Copyright by Ing. Burkhard Kaar, 8580 Koeflach, Austria 
                         <input type="text" id="verbrauch" name="verbrauch" placeholder="z.B. 3.945,30" value="{{.VerbrauchIn}}" required>
                     </div>
                     <div class="form-group">
-                        <label for="preis">Energie-Arbeitspreis (in Cent/kWh):</label>
+                        <label for="preis">Energie Arbeitspreis (in Cent/kWh):</label>
                         <input type="text" id="preis" name="preis" placeholder="z.B. 15.90" value="{{.PreisIn}}" required>
                         <span class="hint">Reiner Energiepreis laut Tarifblatt exkl. Netz und Steuern</span>
                     </div>
@@ -379,7 +381,7 @@ const htmlPart1 = `<!-- Copyright by Ing. Burkhard Kaar, 8580 Koeflach, Austria 
                                 <td class="r">{{printf "%.2f" .Ergebnis.NetzVerlustNetto}} €</td>
                             </tr>
                             <tr>
-                                <td>Netz-Grundpreis &amp; Messpauschale</td>
+                                <td>Netz Grundpreis &amp; Messpauschale</td>
                                 <td class="r">{{printf "%.2f" .Ergebnis.NetzGrundpreis}} €</td>
                             </tr>
                             <tr>
