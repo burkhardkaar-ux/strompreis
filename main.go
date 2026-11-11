@@ -127,7 +127,7 @@ const htmlPart1 = `<!-- Copyright by Ing. Burkhard Kaar, 8580 Koeflach, Austria 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Strompreisrechner Österreich</title>
+    <title>Berechnung Durchlaufträger</title>
     <style>
         body {
             font-family: 'Roboto', sans-serif;
@@ -214,18 +214,11 @@ const htmlPart1 = `<!-- Copyright by Ing. Burkhard Kaar, 8580 Koeflach, Austria 
             border-radius: 4px;
             width: 100%;
             font-weight: bold;
-            transition: all 0.2s;
+            transition: background 0.2s;
         }
 
-        button:hover:not(:disabled) {
+        button:hover {
             background: #336666;
-        }
-
-        button:disabled {
-            background: #cbd5e1;
-            color: #94a3b8;
-            cursor: not-allowed;
-            opacity: 0.7;
         }
 
         .error {
@@ -258,39 +251,6 @@ const htmlPart1 = `<!-- Copyright by Ing. Burkhard Kaar, 8580 Koeflach, Austria 
             color: white !important;
         }
 
-        /* Setzt die vertikale Trennlinie weiter nach links (Spaltenaufteilung) */
-        th:first-child,
-        td:first-child {
-            width: 65%;
-        }
-
-        /* Verhindert, dass Beträge und Einheiten am Smartphone umbrechen */
-        th:last-child,
-        td:last-child {
-            white-space: nowrap;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f8fafc;
-        }
-
-        .r {
-            text-align: right;
-        }
-
-
-        th,
-        td {
-            border: 1px solid #e2e8f0;
-            padding: 8px 12px;
-            text-align: left;
-        }
-
-        th {
-            background-color: #428787 !important;
-            color: white !important;
-        }
-
         tr:nth-child(even) {
             background-color: #f8fafc;
         }
@@ -307,148 +267,152 @@ const htmlPart1 = `<!-- Copyright by Ing. Burkhard Kaar, 8580 Koeflach, Austria 
             font-weight: normal;
         }
 
-        .highlight {
-            font-weight: bold;
-            background-color: #e2f2f2;
-        }
     </style>
-    <script>
-        function pruefeFormular() {
-            var form = document.getElementById('stromForm');
-            var submitBtn = document.getElementById('submitBtn');
-            if (form && submitBtn) {
-                if (form.checkValidity()) {
-                    submitBtn.removeAttribute('disabled');
-                } else {
-                    submitBtn.setAttribute('disabled', 'true');
-                }
-            }
-        }
-        document.addEventListener('DOMContentLoaded', function() {
-            var form = document.getElementById('stromForm');
-            if (form) {
-                form.addEventListener('input', pruefeFormular);
-            }
-            pruefeFormular();
-        });
-        
-        function pruefeFormular() {
-    var form = document.getElementById('stromForm');
-    var submitBtn = document.getElementById('submitBtn');
-    if (form && submitBtn) {
-        if (form.checkValidity()) {
-            submitBtn.removeAttribute('disabled');
-        } else {
-            submitBtn.setAttribute('disabled', 'true');
-        }
-    }
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    var form = document.getElementById('stromForm');
-    if (form) {
-        form.addEventListener('input', pruefeFormular);
-    }
-    pruefeFormular();
-
-    // DIESER TEIL SCHIEBT DAS FORMULAR NACH OBEN, WENN DIE ERGEBNISSE DA SIND:
-    // Der Server fügt bei erfolgreicher Berechnung das <h2>-Element ein.
-    // Sobald dieses Element im Browser existiert, scrollt die Seite automatisch dorthin.
-    var ergebnisUeberschrift = document.querySelector('h2');
-    if (ergebnisUeberschrift) {
-        ergebnisUeberschrift.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-});
-
-    </script>
 </head>
+
 
 <body>
     <div class="card">
-        <h1>Strompreisrechner Österreich</h1>
-        <p style="color: #428787; font-style: italic; margin-top: -5px; margin-bottom: 20px; font-size: 14px;">Berechnungsbasis: Stadtwerke Köflach / Netz Steiermark</p>
+        <h1>Berechnung Durchlaufträger</h1>
+        <p style="color: #428787; font-style: italic; margin-top: -5px; margin-bottom: 20px; font-size: 14px;">Systembelastung: Konstante Gleichlast q = 10.0 kN/m</p>
+
         {{if .Fehler}}
-        <div class="error">{{.Fehler}}</div>{{end}}
-        <form method="POST" id="stromForm">
+        <div class="error">{{.Fehler}}</div>
+        {{end}}
+
+        <form method="POST" id="traegerForm">
             <div class="grid">
                 <div class="box">
-                    <h3>Eingabeparameter</h3>
+                    <h3>Eingabeparameter Träger</h3>
                     <div class="form-group">
-                        <label for="verbrauch">Jahresverbrauch (in kWh):</label>
-                        <input type="text" id="verbrauch" name="verbrauch" placeholder="z.B. 3.945,30" value="{{.VerbrauchIn}}" required>
+                        <label for="felder">Anzahl der Felder:</label>
+                        <input type="number" id="felder" name="felder" placeholder="3" value="{{if .Berechnet}}{{.AnzahlFelder}}{{end}}" min="1" required>
                     </div>
                     <div class="form-group">
-                        <label for="preis">Energie Arbeitspreis (in Cent/kWh):</label>
-                        <input type="text" id="preis" name="preis" placeholder="z.B. 15.90" value="{{.PreisIn}}" required>
-                        <span class="hint">Reiner Energiepreis laut Tarifblatt exkl. Netz und Steuern</span>
+                        <label for="laengen">Feldlängen in Metern (mit Komma getrennt):</label>
+                        <input type="text" id="laengen" name="laengen" value="{{.LaengenInput}}" placeholder="z.B. 4.5, 6.0, 4.5" required>
+                        <span class="hint">Gib die Längen der Felder der Reihe nach ein (z.B. 5, 4.5, 5)</span>
                     </div>
-                    <div>
-                        <h6>© Ing. Burkhard Kaar - Studienprojekt imperative Programmierung, Strompreisrechner für Österreich</h6>
-                    </div>
-                    <button type="submit" id="submitBtn" disabled>Berechnung starten</button>`
 
-                    const htmlPart2 = `{{if .Berechnet}}
-                    <h2>Berechnungsergebnisse</h2>
+                    <div>
+                        <h6>&copy; Ing. Burkhard Kaar - Studienprojekt imperative Programmierung, Berechnung eines Durchlaufträgers nach dem Cross-Verfahren</h6>
+                    </div>
+
+                    <button type="submit" id="submitBtn" disabled>Berechnung starten</button>
+
+                    {{if .Berechnet}}
+                    <h2 class="result-title">Berechnungsergebnisse</h2>
                     <table>
                         <thead>
                             <tr>
-                                <th>Kostenbestandteil</th>
-                                <th class="r">Betrag (Netto)</th>
+                                <th>Stabseite</th>
+                                <th class="r">µ</th>
+                                <th class="r">Moment (kNm)</th>
                             </tr>
                         </thead>
                         <tbody>
+                            {{range .Seiten}}
                             <tr>
-                                <td>Reine Energiekosten</td>
-                                <td class="r">{{printf "%.2f" .Ergebnis.EnergieKostenNetto}} €</td>
+                                <td><strong>{{.Name}}</strong></td>
+                                <td class="r">{{printf "%.2f" .Mu}}</td>
+                                <td class="r">{{printf "%.2f" .MTotal}}</td>
                             </tr>
-                            <tr>
-                                <td>Energie Grundpreis</td>
-                                <td class="r">{{printf "%.2f" .Ergebnis.EnergieGrundpreis}} €</td>
-                            </tr>
-                            <tr>
-                                <td>Netznutzung</td>
-                                <td class="r">{{printf "%.2f" .Ergebnis.NetzArbeitspreis}} €</td>
-                            </tr>
-                            <tr>
-                                <td>Netzverlustentgelt</td>
-                                <td class="r">{{printf "%.2f" .Ergebnis.NetzVerlustNetto}} €</td>
-                            </tr>
-                            <tr>
-                                <td>Netz Grundpreis &amp; Messpauschale</td>
-                                <td class="r">{{printf "%.2f" .Ergebnis.NetzGrundpreis}} €</td>
-                            </tr>
-                            <tr>
-                                <td>Elektrizitätsabgabe</td>
-                                <td class="r">{{printf "%.2f" .Ergebnis.ElektroAbgabeNetto}} €</td>
-                            </tr>
-                            <tr class="highlight">
-                                <td>Zwischensumme Netto</td>
-                                <td class="r">{{printf "%.2f" .Ergebnis.NettoGesamt}} €</td>
-                            </tr>
-                            <tr>
-                                <td>+ 20% Umsatzsteuer</td>
-                                <td class="r">{{printf "%.2f" .Ergebnis.Umsatzsteuer}} €</td>
-                            </tr>
-                            <tr class="highlight" style="background-color: #428787; color: white;">
-                                <td style="color: white;">JAHRESBETRAG BRUTTO</td>
-                                <td class="r" style="color: white;"><strong>{{printf "%.2f" .Ergebnis.BruttoGesamt}} €</strong></td>
-                            </tr>
-                            <tr class="highlight">
-                                <td>Monatlicher Teilzahlungsbetrag</td>
-                                <td class="r">{{printf "%.2f" .Ergebnis.MonatsAbschlag}} €</td>
-                            </tr>
-                            <tr class="highlight">
-                                <td>Effektiver Gesamtpreis je kWh (Brutto)</td>
-                                <td class="r">{{printf "%.2f" .Ergebnis.EffektiverKWhPreis}} Cent/kWh</td>
-                            </tr>
+                            {{end}}
                         </tbody>
                     </table>
                     {{end}}
                 </div>
             </div>
         </form>
+
+        <style>
+            /* Standard-Design für den aktiven Button */
+            button {
+                background: #428787;
+                color: white;
+                border: none;
+                padding: 12px;
+                cursor: pointer;
+                font-size: 16px;
+                border-radius: 4px;
+                width: 100%;
+                font-weight: bold;
+                transition: all 0.2s;
+            }
+
+            button:hover:not(:disabled) {
+                background: #336666;
+            }
+
+            /* Automatisches Ausgrauen, wenn der Button deaktiviert ist */
+            button:disabled {
+                background: #cbd5e1;
+                /* Ein helles Grau */
+                color: #94a3b8;
+                /* Dunklerer Text für Lesbarkeit im Grau */
+                cursor: not-allowed;
+                /* Zeigt ein "Verboten"-Symbol beim Drüberfahren */
+                opacity: 0.7;
+            }
+
+        </style>
+
+        <!-- Dieser kleine JavaScript-Block steuert die Freischaltung live beim Tippen -->
+        <script>
+            const form = document.getElementById('traegerForm');
+            const submitBtn = document.getElementById('submitBtn');
+
+            function pruefeFormular() {
+                // checkValidity() prüft automatisch alle Felder mit "required"
+                if (form.checkValidity()) {
+                    submitBtn.removeAttribute('disabled');
+                } else {
+                    submitBtn.setAttribute('disabled', 'true');
+                }
+            }
+
+            // Lauscht auf jede Eingabe in den Formularfeldern
+            form.addEventListener('input', pruefeFormular);
+
+            // Einmal beim Laden ausführen (falls nach Berechnung bereits Werte drinstehen)
+            pruefeFormular();
+
+            function pruefeFormular() {
+                var form = document.getElementById('stromForm');
+                var submitBtn = document.getElementById('submitBtn');
+                if (form && submitBtn) {
+                    if (form.checkValidity()) {
+                        submitBtn.removeAttribute('disabled');
+                    } else {
+                        submitBtn.setAttribute('disabled', 'true');
+                    }
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+                var form = document.getElementById('stromForm');
+                if (form) {
+                    form.addEventListener('input', pruefeFormular);
+                }
+                pruefeFormular();
+
+                // DIESER TEIL SCHIEBT DAS FORMULAR NACH OBEN, WENN DIE ERGEBNISSE DA SIND:
+                // Der Server fügt bei erfolgreicher Berechnung das <h2>-Element ein.
+                // Sobald dieses Element im Browser existiert, scrollt die Seite automatisch dorthin.
+                var ergebnisUeberschrift = document.querySelector('h2');
+                if (ergebnisUeberschrift) {
+                    ergebnisUeberschrift.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+
+        </script>
+
     </div>
 </body>
 
 </html>
+
 `
