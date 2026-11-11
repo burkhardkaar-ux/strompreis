@@ -119,6 +119,8 @@ const htmlPart1 = `<!-- Copyright by Ing. Burkhard Kaar, 8580 Koeflach, Austria 
 
 <!-- Copyright by Ing. Burkhard Kaar, 8580 Koeflach, Austria -->
 
+<!-- Copyright by Ing. Burkhard Kaar, 8580 Koeflach, Austria -->
+
 <!DOCTYPE html>
 <html lang="de">
 
@@ -312,6 +314,25 @@ const htmlPart1 = `<!-- Copyright by Ing. Burkhard Kaar, 8580 Koeflach, Austria 
     </style>
     <script>
         function pruefeFormular() {
+            var form = document.getElementById('stromForm');
+            var submitBtn = document.getElementById('submitBtn');
+            if (form && submitBtn) {
+                if (form.checkValidity()) {
+                    submitBtn.removeAttribute('disabled');
+                } else {
+                    submitBtn.setAttribute('disabled', 'true');
+                }
+            }
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            var form = document.getElementById('stromForm');
+            if (form) {
+                form.addEventListener('input', pruefeFormular);
+            }
+            pruefeFormular();
+        });
+        
+        function pruefeFormular() {
     var form = document.getElementById('stromForm');
     var submitBtn = document.getElementById('submitBtn');
     if (form && submitBtn) {
@@ -325,18 +346,18 @@ const htmlPart1 = `<!-- Copyright by Ing. Burkhard Kaar, 8580 Koeflach, Austria 
 
 document.addEventListener('DOMContentLoaded', function() {
     var form = document.getElementById('stromForm');
-    
     if (form) {
         form.addEventListener('input', pruefeFormular);
-        form.addEventListener('submit', function(e) {
-            e.preventDefault(); // <-- Stoppt das Neuladen der Seite
-            
-            // Scrollt das Formular sanft ganz nach oben an den Bildschirmrand
-            form.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        });
     }
-    
     pruefeFormular();
+
+    // DIESER TEIL SCHIEBT DAS FORMULAR NACH OBEN, WENN DIE ERGEBNISSE DA SIND:
+    // Der Server fügt bei erfolgreicher Berechnung das <h2>-Element ein.
+    // Sobald dieses Element im Browser existiert, scrollt die Seite automatisch dorthin.
+    var ergebnisUeberschrift = document.querySelector('h2');
+    if (ergebnisUeberschrift) {
+        ergebnisUeberschrift.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
 });
 
     </script>
@@ -430,5 +451,4 @@ document.addEventListener('DOMContentLoaded', function() {
 </body>
 
 </html>
-
 `
