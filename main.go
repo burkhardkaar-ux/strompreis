@@ -113,6 +113,8 @@ const htmlPart1 = `<!-- Copyright by Ing. Burkhard Kaar, 8580 Koeflach, Austria 
 
 <!-- Copyright by Ing. Burkhard Kaar, 8580 Koeflach, Austria -->
 
+<!-- Copyright by Ing. Burkhard Kaar, 8580 Koeflach, Austria -->
+
 <!DOCTYPE html>
 <html lang="de">
 
@@ -230,22 +232,45 @@ const htmlPart1 = `<!-- Copyright by Ing. Burkhard Kaar, 8580 Koeflach, Austria 
             margin-bottom: 20px;
         }
 
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 20px; font-size: 14px; }
-th, td { border: 1px solid #e2e8f0; padding: 8px 12px; text-align: left; }
-th { background-color: #428787 !important; color: white !important; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
 
-/* Setzt die vertikale Trennlinie weiter nach links (Spaltenaufteilung) */
-th:first-child, td:first-child {
-    width: 65%;
-}
+        th,
+        td {
+            border: 1px solid #e2e8f0;
+            padding: 8px 12px;
+            text-align: left;
+        }
 
-/* Verhindert, dass Beträge und Einheiten am Smartphone umbrechen */
-th:last-child, td:last-child {
-    white-space: nowrap;
-}
+        th {
+            background-color: #428787 !important;
+            color: white !important;
+        }
 
-tr:nth-child(even) { background-color: #f8fafc; }
-.r { text-align: right; }
+        /* Setzt die vertikale Trennlinie weiter nach links (Spaltenaufteilung) */
+        th:first-child,
+        td:first-child {
+            width: 65%;
+        }
+
+        /* Verhindert, dass Beträge und Einheiten am Smartphone umbrechen */
+        th:last-child,
+        td:last-child {
+            white-space: nowrap;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        .r {
+            text-align: right;
+        }
 
 
         th,
@@ -280,7 +305,6 @@ tr:nth-child(even) { background-color: #f8fafc; }
             font-weight: bold;
             background-color: #e2f2f2;
         }
-
     </style>
     <script>
         function pruefeFormular() {
@@ -301,7 +325,6 @@ tr:nth-child(even) { background-color: #f8fafc; }
             }
             pruefeFormular();
         });
-
     </script>
 </head>
 
@@ -344,11 +367,11 @@ tr:nth-child(even) { background-color: #f8fafc; }
                                 <td class="r">{{printf "%.2f" .Ergebnis.EnergieKostenNetto}} €</td>
                             </tr>
                             <tr>
-                                <td>Energie Grundpreis (fix)</td>
+                                <td>Energie Grundpreis</td>
                                 <td class="r">{{printf "%.2f" .Ergebnis.EnergieGrundpreis}} €</td>
                             </tr>
                             <tr>
-                                <td>Netznutzung (variabel)</td>
+                                <td>Netznutzung</td>
                                 <td class="r">{{printf "%.2f" .Ergebnis.NetzArbeitspreis}} €</td>
                             </tr>
                             <tr>
@@ -356,7 +379,7 @@ tr:nth-child(even) { background-color: #f8fafc; }
                                 <td class="r">{{printf "%.2f" .Ergebnis.NetzVerlustNetto}} €</td>
                             </tr>
                             <tr>
-                                <td>Netz-Grundpreis &amp; Messpauschale (fix)</td>
+                                <td>Netz-Grundpreis &amp; Messpauschale</td>
                                 <td class="r">{{printf "%.2f" .Ergebnis.NetzGrundpreis}} €</td>
                             </tr>
                             <tr>
