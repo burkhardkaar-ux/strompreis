@@ -113,16 +113,6 @@ const htmlPart1 = `<!-- Copyright by Ing. Burkhard Kaar, 8580 Koeflach, Austria 
 
 <!-- Copyright by Ing. Burkhard Kaar, 8580 Koeflach, Austria -->
 
-<!-- Copyright by Ing. Burkhard Kaar, 8580 Koeflach, Austria -->
-
-<!-- Copyright by Ing. Burkhard Kaar, 8580 Koeflach, Austria -->
-
-<!-- Copyright by Ing. Burkhard Kaar, 8580 Koeflach, Austria -->
-
-<!-- Copyright by Ing. Burkhard Kaar, 8580 Koeflach, Austria -->
-
-<!-- Copyright by Ing. Burkhard Kaar, 8580 Koeflach, Austria -->
-
 <!DOCTYPE html>
 <html lang="de">
 
@@ -136,7 +126,7 @@ const htmlPart1 = `<!-- Copyright by Ing. Burkhard Kaar, 8580 Koeflach, Austria 
             max-width: 800px;
             margin: 20px auto;
             padding: 20px;
-            background: #000000;
+            background: #141150 !important;
             color: #333;
         }
 
