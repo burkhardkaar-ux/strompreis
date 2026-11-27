@@ -33,12 +33,24 @@ type PageData struct {
 	Ergebnis    StromRechnung
 }
 
+// parseGermanFloat wandelt Eingaben wie "3.945,30", "3945,30" oder "15.90" sicher in float64 um
+func parseGermanFloat(input string) (float64, error) {
+	s := strings.TrimSpace(input)
+	if strings.Contains(s, ",") {
+		// Bei Verwendung eines Kommas sind Punkte Tausendertrennzeichen -> entfernen
+		s = strings.ReplaceAll(s, ".", "")
+		s = strings.ReplaceAll(s, ",", ".")
+	}
+	return strconv.ParseFloat(s, 64)
+}
+
 func berechneStrompreis(verbrauch float64, preisProKWh float64) StromRechnung {
+	// Basiswerte (Netto) für Stadtwerke Köflach / Netz Steiermark
 	energieGrundpreis := 59.90
 	netzArbeitspreisProKWh := 9.11
 	netzVerlustProKWh := 0.40
-	netzGrundpreis := 210.00
-	elektroAbgabeProKWh := 1.50
+	netzGrundpreis := 75.00     // Realistischer Wert (Netznutzung Grundpreis + Messentgelt netto)
+	elektroAbgabeProKWh := 1.50 // Reguläre Elektrizitätsabgabe in Cent/kWh
 
 	energieKostenNetto := verbrauch * (preisProKWh / 100.0)
 	netzArbeitNetto := verbrauch * (netzArbeitspreisProKWh / 100.0)
@@ -69,9 +81,7 @@ func berechneStrompreis(verbrauch float64, preisProKWh float64) StromRechnung {
 }
 
 func main() {
-	// Die beiden HTML-Teile sicher zusammenfügen
-	vollstaendigesHTML := htmlPart1 + htmlPart2
-	tmpl := template.Must(template.New("index").Parse(vollstaendigesHTML))
+	tmpl := template.Must(template.New("index").Parse(htmlTemplate))
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		data := PageData{
@@ -80,14 +90,14 @@ func main() {
 		}
 
 		if r.Method == http.MethodPost {
-			vStr := strings.TrimSpace(strings.ReplaceAll(r.FormValue("verbrauch"), ",", "."))
-			pStr := strings.TrimSpace(strings.ReplaceAll(r.FormValue("preis"), ",", "."))
+			rawVerbrauch := r.FormValue("verbrauch")
+			rawPreis := r.FormValue("preis")
 
-			data.VerbrauchIn = vStr
-			data.PreisIn = pStr
+			data.VerbrauchIn = strings.TrimSpace(rawVerbrauch)
+			data.PreisIn = strings.TrimSpace(rawPreis)
 
-			verbrauch, errV := strconv.ParseFloat(vStr, 64)
-			preis, errP := strconv.ParseFloat(pStr, 64)
+			verbrauch, errV := parseGermanFloat(rawVerbrauch)
+			preis, errP := parseGermanFloat(rawPreis)
 
 			if errV != nil || errP != nil || verbrauch <= 0 || preis <= 0 {
 				data.Fehler = "Bitte gib gültige positive Zahlen für den Verbrauch und den Energiepreis ein."
@@ -109,10 +119,7 @@ func main() {
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
 
-const htmlPart1 = `<!-- Copyright by Ing. Burkhard Kaar, 8580 Koeflach, Austria -->
-
-<!-- Copyright by Ing. Burkhard Kaar, 8580 Koeflach, Austria -->
-
+const htmlTemplate = `<!-- Copyright by Ing. Burkhard Kaar, 8580 Koeflach, Austria -->
 <!DOCTYPE html>
 <html lang="de">
 
@@ -250,37 +257,14 @@ const htmlPart1 = `<!-- Copyright by Ing. Burkhard Kaar, 8580 Koeflach, Austria 
             color: white !important;
         }
 
-        /* Setzt die vertikale Trennlinie weiter nach links (Spaltenaufteilung) */
         th:first-child,
         td:first-child {
             width: 65%;
         }
 
-        /* Verhindert, dass Beträge und Einheiten am Smartphone umbrechen */
         th:last-child,
         td:last-child {
             white-space: nowrap;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f8fafc;
-        }
-
-        .r {
-            text-align: right;
-        }
-
-
-        th,
-        td {
-            border: 1px solid #e2e8f0;
-            padding: 8px 12px;
-            text-align: left;
-        }
-
-        th {
-            background-color: #428787 !important;
-            color: white !important;
         }
 
         tr:nth-child(even) {
@@ -316,42 +300,19 @@ const htmlPart1 = `<!-- Copyright by Ing. Burkhard Kaar, 8580 Koeflach, Austria 
                 }
             }
         }
+
         document.addEventListener('DOMContentLoaded', function() {
             var form = document.getElementById('stromForm');
             if (form) {
                 form.addEventListener('input', pruefeFormular);
             }
             pruefeFormular();
+
+            var ergebnisUeberschrift = document.querySelector('h2');
+            if (ergebnisUeberschrift) {
+                ergebnisUeberschrift.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
         });
-        
-        function pruefeFormular() {
-    var form = document.getElementById('stromForm');
-    var submitBtn = document.getElementById('submitBtn');
-    if (form && submitBtn) {
-        if (form.checkValidity()) {
-            submitBtn.removeAttribute('disabled');
-        } else {
-            submitBtn.setAttribute('disabled', 'true');
-        }
-    }
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    var form = document.getElementById('stromForm');
-    if (form) {
-        form.addEventListener('input', pruefeFormular);
-    }
-    pruefeFormular();
-
-    // DIESER TEIL SCHIEBT DAS FORMULAR NACH OBEN, WENN DIE ERGEBNISSE DA SIND:
-    // Der Server fügt bei erfolgreicher Berechnung das <h2>-Element ein.
-    // Sobald dieses Element im Browser existiert, scrollt die Seite automatisch dorthin.
-    var ergebnisUeberschrift = document.querySelector('h2');
-    if (ergebnisUeberschrift) {
-        ergebnisUeberschrift.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-});
-
     </script>
 </head>
 
@@ -377,9 +338,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div>
                         <h6>© Ing. Burkhard Kaar - Studienprojekt imperative Programmierung, Strompreisrechner für Österreich</h6>
                     </div>
-                    <button type="submit" id="submitBtn" disabled>Berechnung starten</button>`
+                    <button type="submit" id="submitBtn" disabled>Berechnung starten</button>
 
-                    const htmlPart2 = `{{if .Berechnet}}
+                    {{if .Berechnet}}
                     <h2>Berechnungsergebnisse</h2>
                     <table>
                         <thead>
@@ -443,5 +404,4 @@ document.addEventListener('DOMContentLoaded', function() {
 </body>
 
 </html>
-
 `
